@@ -7,31 +7,32 @@ const response = require('./response')
 
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-  const sql = "SELECT * FROM MAHASISWA"
-    db.query(sql, (error, result) => {
-      // hasil data dari mysql
-      response(200, result, "get all data from mahasiswa", res)
-    })
+app.get("/", (req,res) => {
+  response(200, "ini data", "ini message", res)
 })
 
-app.get('/name', (req, res) => {
-  const sql = `SELECT nama_lengkap FROM mahasiswa WHERE nim = ${req.query.nim}`
-  db.query(sql, (error, result) => {
-    response(200,result, "find mahasiswa name", res)
-  })
+app.get("/mahasiswa", (req,res) => {
+  response(200, "mahasisswa get list", res)
 })
 
-app.get('/alamat', (req,res) => {
-  const sql = `SELECT alamat FROM mahasiswa WHERE nim = ${req.query.nim}`
-  db.query(sql, (error, result) => {
-    response(200,result, "find mahasiswa alamat", res)
-  })
+app.get("/mahasiswa/:nim", (req,res) => {
+  const nim = req.params.nim
+  response(200,`spesifik mahasiswa by id ${nim}`, res)
 })
 
-app.get('/kelas', (req, res) => {
-  const sql = `SELECT kelas FROM mahasiswa WHERE nim = ${req.query.nim}`
-  db.query(sql, (error, result) => {
-    response(200,result,"find mahasiswa kelas", res)
-  })
+app.post("/mahasiswa", (req,res) => {
+  response(200,"ini posting", res)
+})
+
+app.put("/mahasiswa", (req,res) => {
+  response(200,"ini put atau update data", res)
+})
+
+app.delete("/mahasiswa", (req,res) => {
+  response(200,"ini delete data", res)
+})
+
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
 })
