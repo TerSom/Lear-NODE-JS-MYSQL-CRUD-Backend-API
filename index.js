@@ -8,28 +8,77 @@ const response = require('./response')
 app.use(bodyParser.json())
 
 app.get("/", (req,res) => {
-  response(200, "ini data", "ini message", res)
+  response(200, "API v1 ready to go", "SUCCESS", res)
 })
 
 app.get("/mahasiswa", (req,res) => {
-  response(200, "mahasisswa get list", res)
+  const sql = "SELECT * FROM mahasiswa"
+  db.query(sql, (err,fields) => {
+    if(err) throw err
+    response(200, fields,"mahasisswa get list", res)
+  })
 })
 
 app.get("/mahasiswa/:nim", (req,res) => {
   const nim = req.params.nim
-  response(200,`spesifik mahasiswa by id ${nim}`, res)
+  const sql = `SELECT * FROM mahasiswa WHERE nim = ${nim}`
+  db.query(sql, (err,fields) => {
+    if (err) throw err
+    response(200, fields, "get detail mahasiswa", res)
+  })
 })
 
 app.post("/mahasiswa", (req,res) => {
-  response(200,"ini posting", res)
+  const { nim, namaLengkap, kelas, alamat } = req.body
+
+  const sql = `INSERT INTO mahasiswa (nim, nama_lengkap, kelas, alamat) VALUES (${nim}, '${namaLengkap}','${kelas}','${alamat}')`
+  
+  db.query(sql, (err,fields) => {
+    if(err) response(500, "invalid", "eror" , res)
+    if (fields?.affectedRows){
+      const data = {
+        isSuccuss: fields.affectedRows,
+        id: fields.insertId,
+      }
+      response(200, data, "data added successfuly", res)
+    }
+  })
 })
 
 app.put("/mahasiswa", (req,res) => {
-  response(200,"ini put atau update data", res)
+  const { nim, namaLengkap, kelas, alamat} = req.body
+  const sql = `UPDATE mahasiswa SET nama_lengkap = '${namaLengkap}',kelas = '${kelas}', alamat = '${alamat}' WHERE nim = ${nim}`
+
+  db.query(sql, (err,fields) => {
+    if(err) response(500, "invalid", "error" ,res)
+    if(fields?.affectedRows) {
+      const data = {
+        isSuccuss: fields.affectedRows,
+        message: fields.message,
+      }
+      response(200, data ,"Update data successfully", res)
+    }else {
+      response(404, "user not found", "error", res)
+    }
+  })
+
 })
 
 app.delete("/mahasiswa", (req,res) => {
-  response(200,"ini delete data", res)
+  const { nim } = req.body
+  const sql = `DELETE FROM mahasiswa WHERE nim = ${nim} ` 
+  db.query(sql, (err, fields) => {
+    if(err) response(500, "invalid", "error" , res)
+    
+    if(fields?.affectedRows) {
+      const data = {
+        isDeleted: fields.affectedRows
+    }
+    response(200,data, "delete data successfully" , res)
+  }else {
+    response(404, "user not found", "error", res)
+  }
+  })
 })
 
 
